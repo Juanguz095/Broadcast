@@ -142,7 +142,7 @@ h3 {
   object-fit: cover;
   pointer-events: none; /* muy importante */
 }
-.vidrioCrt {
+.vidrioCrt {/*no se usa*/
   position: absolute;
   inset: 0;
   background: radial-gradient(
