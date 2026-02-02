@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Coffee Stained — morning style</title>
+  <title>Broadcast</title>
 
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -21,26 +21,97 @@
       <div class="televisor">
         <!-- PANTALLA (VA PRIMERO) -->
         <div class="pantallaCrt">
-          <video class="videoCanal" autoplay loop></video>
+          <video class="videoCanal" autoplay muted loop></video>
         </div>
+
+          <input type="range" class="slider" data-control="warp">
+          <input type="range" class="slider" data-control="noise">
+          <input type="range" class="slider" data-control="sync">
 
         <!-- TELE (VA DESPUÉS) -->
         <img src="old-tv-removebg-preview.png" class="imagenTelevisor">
       </div>
 
-      <script> const video = document.querySelector(".videoCanal"); video.src = "videos/Tonetta - Yummy Yummy Pizza.mp4"; video.play(); </script>
+      <script>
+        /* =====================
+          REFERENCIAS
+        ===================== */
+        const televisor = document.querySelector(".televisor");
+        const video = document.querySelector(".videoCanal");
 
+        /* =====================
+          CANALES
+        ===================== */
+        const canales = [
+          { src: "videos/Tonetta - Yummy Yummy Pizza.mp4", volumen: 0.6 },
+          { src: "videos/canal2.mp4", volumen: 0.3 },
+          { src: "videos/canal3.mp4", volumen: 1 }
+        ];
 
+        let canalActual = 0;
+        let audioDesbloqueado = false;
 
-        <!-- perillas -->
-        <div class="perilla" data-control="warp"></div>
-        <div class="perilla" data-control="noise"></div>
-        <div class="perilla" data-control="sync"></div>
+        /* =====================
+          AUDIO
+        ===================== */
+        function activarAudio() {
+          if (audioDesbloqueado) return;
 
-        <!-- slider oculto -->
-        <input type="range" class="sliderOculto" data-control="warp">
+          video.muted = false;
+          video.volume = canales[canalActual].volumen;
 
-      </div>
+          audioDesbloqueado = true;
+          console.log("🔊 Audio desbloqueado");
+        }
+
+        /* =====================
+          CANALES
+        ===================== */
+        function cambiarCanal(index) {
+          const canal = canales[index];
+
+          video.src = canal.src;
+          video.volume = canal.volumen;
+
+          video.load();
+
+          if (audioDesbloqueado) {
+            video.play();
+          }
+        }
+
+        function canalArriba() {
+          activarAudio();
+          canalActual = (canalActual + 1) % canales.length;
+          cambiarCanal(canalActual);
+        }
+
+        function canalAbajo() {
+          activarAudio();
+          canalActual = (canalActual - 1 + canales.length) % canales.length;
+          cambiarCanal(canalActual);
+        }
+
+        /* =====================
+          INTERACCIÓN
+        ===================== */
+
+        /* tocar la tele desbloquea audio */
+        televisor.addEventListener("mousedown", activarAudio);
+
+        /* botones / perillas */
+        const btnUp = document.querySelector('[data-control="canalUp"]');
+        const btnDown = document.querySelector('[data-control="canalDown"]');
+
+        if (btnUp) btnUp.addEventListener("mousedown", canalArriba);
+        if (btnDown) btnDown.addEventListener("mousedown", canalAbajo);
+
+        /* =====================
+          INICIO
+        ===================== */
+        video.muted = true;         // obligatorio por el navegador
+        cambiarCanal(canalActual); // carga primer canal
+      </script>
     </article>
   </main>
 </body>
